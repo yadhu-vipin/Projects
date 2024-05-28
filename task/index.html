@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task Management Dashboard UI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      display: flex;
+      height: 100vh;
+      background-color: #f5f5f5;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .task-manager {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    .left-bar {
+      width: 250px;
+      height: 100%;
+      background-color: #041e38;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .upper-part {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .circle,
+    .circle-2 {
+      width: 10px;
+      height: 10px;
+      background-color: #fff;
+      border-radius: 50%;
+      margin: 0 5px;
+    }
+
+    .circle-2 {
+      animation: load 2s linear infinite;
+    }
+
+
+    .left-content {
+      padding: 20px;
+    }
+
+    .notes-page {
+      display: none;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+    }
+
+    .notes-header {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .notes-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .notes-textarea {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      resize: none;
+    }
+
+    .save-notes-button {
+      padding: 10px;
+      margin-top: 10px;
+      background-color: #041e38;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .save-notes-button:hover {
+      background-color: #062a52;
+    }
+
+    /* Deviant art */
+    .deviant-art {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    .deviant-art img {
+      max-width: 100%;
+      border-radius: 10px;
+    }
+
+    .action-list,
+    .category-list {
+      list-style: none;
+      padding: 10px 0;
+      width: 100%;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      height: 40px;
+      padding: 0 15px;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .item:hover {
+      background-color: #495057;
+    }
+
+    .item img {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+    }
+
+    .page-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      width: 50vh;
+    }
+
+    .header {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    .content-categories {
+      display: flex;
+      margin-bottom: 20px;
+    }
+
+    .label-wrapper {
+      position: relative;
+      margin-right: 20px;
+      cursor: pointer;
+    }
+
+    .right-bar {
+      padding: 10px;
+      position: relative;
+      top: 1px;
+      width: 40vh;
+    }
+
+    .category {
+      display: block;
+      width: 100px;
+      height: 40px;
+      line-height: 40px;
+      text-align: center;
+      border-radius: 5px;
+      background-color: #e9ecef;
+      color: #333;
+      transition: background-color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .category:hover {
+      background-color: #d4d5d6;
+    }
+
+    .nav-item {
+      display: none;
+    }
+
+    .tasks-wrapper {
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+      overflow-y: auto;
+      width: ;
+    }
+
+    .task {
+      display: flex;
+      align-items: center;
+      height: 60px;
+      padding: 0 15px;
+      border-radius: 5px;
+      background-color: #fff;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: background-color 0.3s ease;
+      cursor: move;
+    }
+
+    .task-item {
+      display: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background-color: #fff;
+      border: 1px solid #adb5bd;
+      border-radius: 50%;
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .task-item:checked {
+      background-color: #28a745;
+      border-color: #28a745;
+    }
+
+    .label-text {
+      flex: 1;
+      margin-left: 30px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px 10px;
+      font-size: 12px;
+      border-radius: 20px;
+      margin-left: auto;
+    }
+
+    .approved {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .progress {
+      background-color: #ffc107;
+      color: #fff;
+    }
+
+    .review {
+      background-color: #17a2b8;
+      color: #fff;
+    }
+
+    .waiting {
+      background-color: #6c757d;
+      color: #fff;
+    }
+
+    .right-bar {
+      width: 500px;
+      height: 100%;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-part {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .top-part img {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 10px;
+    }
+
+    .count {
+      font-size: 24px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .header {
+      font-size: 24px;
+      font-weight: bold;
+      padding: 20px;
+    }
+
+    .right-content {
+      padding: 20px;
+      height: calc(100% - 120px);
+      overflow-y: auto;
+    }
+
+    .task-box {
+      display: flex;
+      align-items: center;
+      height: 80px;
+      padding: 0 20px;
+      border-radius: 5px;
+      position: relative;
+      margin-bottom: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .task-box:hover {
+      background-color: #f5f5f5;
+    }
+
+    .description-task {
+      flex: 1;
+      margin-left: 20px;
+    }
+
+    .time {
+      font-size: 14px;
+      color: #6c757d;
+      margin-bottom: 5px;
+    }
+
+    .task-name {
+      font-size: 16px;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .members {
+      display: flex;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .members img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-left: 10px;
+    }
+
+    .more-button {
+      width: 30px;
+      height: 30px;
+      background-color: #adb5bd;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      right: 20px;
+      top: 25px;
+      cursor: pointer;
+    }
+
+    .more-button:hover {
+      background-color: #9fa8b9;
+    }
+
+    .yellow {
+      background-color: #ffc107;
+    }
+
+    .blue {
+      background-color: #17a2b8;
+    }
+
+    .red {
+      background-color: #dc3545;
+    }
+
+    .green {
+      background-color: #28a745;
+    }
+
+
+    .search-icon {
+      width: 20px;
+      height: 20px;
+      position: absolute;
+      left: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .wrapper {
+      width: 450px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .wrapper header {
+      display: flex;
+      align-items: center;
+      padding: 25px 30px 10px;
+      justify-content: space-between;
+    }
+
+    #prev {
+      position: relative;
+      right: 80px;
+    }
+
+    #next {
+      position: relative;
+      bottom: 39px;
+    }
+
+    header .icons span {
+      height: 38px;
+      width: 38px;
+      margin: 0 1px;
+      cursor: pointer;
+      color: #878787;
+      text-align: center;
+      line-height: 38px;
+      font-size: 1.9rem;
+      user-select: none;
+      border-radius: 50%;
+    }
+
+    .icons span:last-child {
+      margin-right: -10px;
+    }
+
+    header .icons span:hover {
+      background: #f2f2f2;
+    }
+
+    header .current-date {
+      font-size: 1.45rem;
+      font-weight: 500;
+    }
+
+    .calendar {
+      padding: 20px;
+    }
+
+    .calendar ul {
+      display: flex;
+      flex-wrap: wrap;
+      list-style: none;
+      text-align: center;
+    }
+
+    .calendar .days {
+      margin-bottom: 20px;
+    }
+
+    .calendar li {
+      color: #333;
+      width: calc(100% / 7);
+      font-size: 1.07rem;
+    }
+
+    .calendar .weeks li {
+      font-weight: 500;
+      cursor: default;
+    }
+
+    .calendar .days li {
+      z-index: 1;
+      cursor: pointer;
+      position: relative;
+      margin-top: 30px;
+    }
+
+    .days li.inactive {
+      color: #aaa;
+    }
+
+    .days li.active {
+      color: #fff;
+    }
+
+    .days li::before {
+      position: absolute;
+      content: "";
+      left: 50%;
+      top: 50%;
+      height: 40px;
+      width: 40px;
+      z-index: -1;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .days li.active::before {
+      background: #9B59B6;
+    }
+
+    .days li:not(.active):hover::before {
+      background: #f2f2f2;
+    }
+    #All:hover{
+      background-color: #9fa8b9; 
+    }
+    #Approved:hover{
+      background-color: #036123; 
+    }
+    #Progress:hover{
+      background-color: #ffd500; 
+    }
+    #Review:hover{
+      background-color: #0d7a87; 
+    }
+    #Waiting:hover{
+      background-color: #4c4f4d; 
+    }
+    .add-task{
+      position: relative;
+      top: 50vh;
+      right: 80vh;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="task-manager">
+    <!-- left bar starts -->
+    <div class="left-bar">
+      <div class="left-content">
+        <ul class="action-list">
+          <li class="item" id="home-link"> Home</li>
+          <li class="item" id="notes-link">Notes</li>
+        </ul>
+        <ul class="category-list">
+          <li class="item" id="All"> All</li>
+          <li class="item" id="Approved">Approved</li>
+          <li class="item" id="Progress">In Progress</li>
+          <li class="item" id="Review">In Review</li>
+          <li class="item" id="Waiting"> Waiting</li>
+        </ul>
+      </div>
+    </div>
+    <!-- left bar ends -->
+
+    <!-- page content starts -->
+    <div class="page-content">
+      <div class="header">Task Manager</div>
+
+      <div class="content-categories">
+        <div class="label-wrapper">
+          <span class="category">All</span>
+        </div>
+        <div class="label-wrapper">
+          <span class="category">Approved</span>
+        </div>
+        <div class="label-wrapper">
+          <span class="category">Progress</span>
+        </div>
+        <div class="label-wrapper">
+          <span class="category">Review</span>
+        </div>
+        <div class="label-wrapper">
+          <span class="category">Waiting</span>
+        </div>
+        <div class="add-task">
+          <input type="text" id="new-task" placeholder="Add a new task...">
+          <button id="add-task-button">Add Task</button>
+        </div>
+      </div>
+
+      <div class="tasks-wrapper">
+        <div class="task" draggable="true">
+          <input type="checkbox" class="task-item" />
+          <span class="label-text">Task 1</span>
+          <span class="tag approved">Approved</span>
+        </div>
+        <div class="task" draggable="true">
+          <input type="checkbox" class="task-item" />
+          <span class="label-text">Task 2</span>
+          <span class="tag progress">Progress</span>
+        </div>
+        <div class="task" draggable="true">
+          <input type="checkbox" class="task-item" />
+          <span class="label-text">Task 3</span>
+          <span class="tag review">Review</span>
+        </div>
+        <div class="task" draggable="true">
+          <input type="checkbox" class="task-item" />
+          <span class="label-text">Task 4</span>
+          <span class="tag waiting">Waiting</span>
+        </div>
+      </div>
+    </div>
+    <div class="notes-page" id="notes-page">
+      <div class="notes-header">Notes</div>
+      <div class="notes-content">
+        <textarea class="notes-textarea" id="notes-textarea" placeholder="Write your notes here..."></textarea>
+        <button class="save-notes-button" id="save-notes-button">Save Notes</button>
+        <div class="deviant-art">
+          <img src="https://www.deviantart.com/download/831636305/night_sky_by_deviantart_d2u4f8j-fullview.jpg"
+            alt="Deviant Art">
+        </div>
+      </div>
+    </div>
+    <!-- page content ends -->
+
+    <!-- right bar starts -->
+    <div class="right-bar">
+      <div class="top-part">
+
+        <div class="count">4</div>
+        <div class="header">Tasks</div>
+      </div>
+      <div class="right-content">
+        <div class="task-box yellow">
+          <div class="description-task">
+            <div class="time">3 days ago</div>
+            <div class="task-name">Task 1</div>
+          </div>
+          <div class="members">
+
+          </div>
+          <div class="more-button">...</div>
+        </div>
+        <div class="task-box blue">
+          <div class="description-task">
+            <div class="time">1 day ago</div>
+            <div class="task-name">Task 2</div>
+          </div>
+          <div class="members">
+
+          </div>
+          <div class="more-button">...</div>
+        </div>
+        <div class="task-box red">
+          <div class="description-task">
+            <div class="time">5 hours ago</div>
+            <div class="task-name">Task 3</div>
+          </div>
+          <div class="members">
+
+          </div>
+          <div class="more-button">...</div>
+        </div>
+        <div class="task-box green">
+          <div class="description-task">
+            <div class="time">2 hours ago</div>
+            <div class="task-name">Task 4</div>
+          </div>
+          <div class="members">
+
+          </div>
+          <div class="more-button">...</div>
+        </div>
+        <div class="wrapper">
+          <header>
+            <p class="current-date"></p>
+            <div class="icons">
+              <span id="prev" class="material-symbols-rounded">left</span>
+              <span id="next" class="material-symbols-rounded">right</span>
+            </div>
+          </header>
+          <div class="calendar">
+            <ul class="weeks">
+              <li>Sun</li>
+              <li>Mon</li>
+              <li>Tue</li>
+              <li>Wed</li>
+              <li>Thu</li>
+              <li>Fri</li>
+              <li>Sat</li>
+            </ul>
+            <ul class="days"></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- right bar ends -->
+  </div>
+
+  <script>
+    const homeLink = document.getElementById('home-link');
+    const addTaskLink = document.getElementById('add-task-link');
+    const notesLink = document.getElementById('notes-link');
+    const pageContent = document.querySelector('.page-content');
+    const notesPage = document.getElementById('notes-page');
+
+    homeLink.addEventListener('click', () => {
+      pageContent.style.display = 'block';
+      notesPage.style.display = 'none';
+    });
+
+    addTaskLink.addEventListener('click', () => {
+      pageContent.style.display = 'block';
+      notesPage.style.display = 'none';
+    });
+
+    notesLink.addEventListener('click', () => {
+      pageContent.style.display = 'none';
+      notesPage.style.display = 'flex';
+      loadNotes();
+    });
+
+    // Save and load notes
+    const saveNotesButton = document.getElementById('save-notes-button');
+    const notesTextarea = document.getElementById('notes-textarea');
+
+    saveNotesButton.addEventListener('click', () => {
+      const notesContent = notesTextarea.value;
+      localStorage.setItem('notes', notesContent);
+    });
+
+    function loadNotes() {
+      const savedNotes = localStorage.getItem('notes');
+      if (savedNotes) {
+        notesTextarea.value = savedNotes;
+      } else {
+        notesTextarea.value = '';
+      }
+    }
+
+    // Load notes on page load
+    loadNotes();
+    const newTaskInput = document.getElementById('new-task');
+    const addTaskButton = document.getElementById('add-task-button');
+    const taskWrapper = document.querySelector('.tasks-wrapper');
+
+    function addTask(taskText) {
+      const newTask = document.createElement('div');
+      newTask.classList.add('task');
+      newTask.draggable = true;
+      newTask.innerHTML = `
+    <input type="checkbox" class="task-item">
+    <span class="label-text">${taskText}</span>
+    <span class="status approved">Approved</span>
+    <button class="delete-task">Delete</button>
+  `;
+
+      taskWrapper.appendChild(newTask);
+
+      const deleteTaskButton = newTask.querySelector('.delete-task');
+      deleteTaskButton.addEventListener('click', () => {
+        tasksWrapper.removeChild(newTask);
+      });
+
+      const statusButton = newTask.querySelector('.status');
+      statusButton.addEventListener('click', () => {
+        const newStatus = prompt('Enter a new status:');
+        if (newStatus) {
+          statusButton.innerText = newStatus;
+          statusButton.classList.remove('approved');
+          statusButton.classList.add(newStatus.toLowerCase());
+        }
+      });
+    }
+
+    addTaskButton.addEventListener('click', () => {
+      const taskText = newTaskInput.value.trim();
+      if (taskText === '') return;
+
+      addTask(taskText);
+      newTaskInput.value = '';
+    });
+    const tasks = document.querySelectorAll('.task');
+    let draggedTask = null;
+
+    tasks.forEach(task => {
+      task.addEventListener('dragstart', dragStart);
+      task.addEventListener('dragover', dragOver);
+      task.addEventListener('drop', drop);
+      task.addEventListener('dragend', dragEnd);
+    });
+
+    function dragStart(e) {
+      draggedTask = this;
+      setTimeout(() => this.style.display = 'none', 0);
+    }
+
+    function dragOver(e) {
+      e.preventDefault();
+    }
+
+    function drop() {
+      this.style.display = 'flex';
+      if (this !== draggedTask) {
+        this.parentNode.insertBefore(draggedTask, this);
+      }
+    }
+
+    function dragEnd() {
+      this.style.display = 'flex';
+      draggedTask = null;
+    }
+
+    // Handling category click
+    const categories = document.querySelectorAll('.category');
+    const tasksWrapper = document.querySelector('.tasks-wrapper');
+
+    categories.forEach(category => {
+      category.addEventListener('click', function () {
+        const selectedCategory = this.innerText.toLowerCase().replace(' ', '-');
+        const allTasks = tasksWrapper.querySelectorAll('.task');
+
+        allTasks.forEach(task => {
+          const taskTag = Array.from(task.querySelector('.tag').classList);
+          if (selectedCategory === 'all' || taskTag.includes(selectedCategory)) {
+            task.style.display = 'flex';
+          } else {
+            task.style.display = 'none';
+          }
+        });
+      });
+    });
+    const daysTag = document.querySelector(".days"),
+      currentDate = document.querySelector(".current-date"),
+      prevNextIcon = document.querySelectorAll(".icons span");
+
+    // getting new date, current year and month
+    let date = new Date(),
+      currYear = date.getFullYear(),
+      currMonth = date.getMonth();
+
+    // storing full name of all months in array
+    const months = ["January", "February", "March", "April", "May", "June", "July",
+      "August", "September", "October", "November", "December"];
+
+    const renderCalendar = () => {
+      let firstDayofMonth = new Date(currYear, currMonth, 1).getDay(), // getting first day of month
+        lastDateofMonth = new Date(currYear, currMonth + 1, 0).getDate(), // getting last date of month
+        lastDayofMonth = new Date(currYear, currMonth, lastDateofMonth).getDay(), // getting last day of month
+        lastDateofLastMonth = new Date(currYear, currMonth, 0).getDate(); // getting last date of previous month
+      let liTag = "";
+
+      for (let i = firstDayofMonth; i > 0; i--) { // creating li of previous month last days
+        liTag += `<li class="inactive">${lastDateofLastMonth - i + 1}</li>`;
+      }
+
+      for (let i = 1; i <= lastDateofMonth; i++) { // creating li of all days of current month
+        // adding active class to li if the current day, month, and year matched
+        let isToday = i === date.getDate() && currMonth === new Date().getMonth()
+          && currYear === new Date().getFullYear() ? "active" : "";
+        liTag += `<li class="${isToday}">${i}</li>`;
+      }
+
+      for (let i = lastDayofMonth; i < 6; i++) { // creating li of next month first days
+        liTag += `<li class="inactive">${i - lastDayofMonth + 1}</li>`
+      }
+      currentDate.innerText = `${months[currMonth]} ${currYear}`; // passing current mon and yr as currentDate text
+      daysTag.innerHTML = liTag;
+    }
+    renderCalendar();
+
+    prevNextIcon.forEach(icon => { // getting prev and next icons
+      icon.addEventListener("click", () => { // adding click event on both icons
+        // if clicked icon is previous icon then decrement current month by 1 else increment it by 1
+        currMonth = icon.id === "prev" ? currMonth - 1 : currMonth + 1;
+
+        if (currMonth < 0 || currMonth > 11) { // if current month is less than 0 or greater than 11
+          // creating a new date of current year & month and pass it as date value
+          date = new Date(currYear, currMonth, new Date().getDate());
+          currYear = date.getFullYear(); // updating current year with new date year
+          currMonth = date.getMonth(); // updating current month with new date month
+        } else {
+          date = new Date(); // pass the current date as date value
+        }
+        renderCalendar(); // calling renderCalendar function
+      });
+    });
+  </script>
+
+</body>
+
+</html>
